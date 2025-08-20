@@ -118,7 +118,7 @@ public class MusicManager {
         GPM.getValues().sortSongs();
 
         // 创建 Jukebox ItemStack
-        ItemStack i = new ItemStack(Material.JUKEBOX);
+        i = new ItemStack(Material.JUKEBOX);
         ItemMeta im = i.getItemMeta();
         im.setDisplayName(GPM.getMManager().getMessage("Items.jukebox-title"));
         im.setLocalizedName(GPM.NAME + "_JB");

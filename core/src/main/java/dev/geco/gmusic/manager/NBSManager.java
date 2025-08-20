@@ -18,6 +18,134 @@ public class NBSManager {
         gMusicMain = GPluginMain;
     }
 
+    public boolean oldVerConvertFile(File NBSFile, File outFile) {
+
+        try {
+            DataInputStream dis = new DataInputStream(new FileInputStream(NBSFile));
+            short l = readShort(dis);
+            int v = 0;
+
+            if (l == 0) {
+                v = dis.readByte();
+                dis.readByte();
+                if (v >= 3) l = readShort(dis);
+            }
+
+            short h = readShort(dis);
+            String t = readString(dis);
+            if (t.equals("")) t = NBSFile.getName().replaceFirst("[.][^.]+$", "");
+            String a = readString(dis);
+            String o = readString(dis);
+            String d = readString(dis);
+            float s = readShort(dis) / 100f;
+            dis.readBoolean();
+            dis.readByte();
+            dis.readByte();
+            readInt(dis);
+            readInt(dis);
+            readInt(dis);
+            readInt(dis);
+            readInt(dis);
+            readString(dis);
+
+            if (v >= 4) {
+                dis.readByte();
+                dis.readByte();
+                readShort(dis);
+            }
+
+            List<String> sc = new ArrayList<>();
+            List<Byte> il = new ArrayList<>();
+
+            while (true) {
+
+                short jt = readShort(dis);
+                if (jt == 0) break;
+
+                String c = ((long) ((sc.size() == 0 ? jt - 1 : jt) * 1000 / s)) + "!";
+
+                while (true) {
+                    short jl = readShort(dis);
+                    if (jl == 0) break;
+                    byte i = dis.readByte();
+                    byte k = dis.readByte();
+                    int p = 100;
+
+                    if (v >= 4) {
+                        dis.readByte();
+                        p = 200 - dis.readUnsignedByte();
+                        readShort(dis);
+                    }
+
+                    String c1 = i + "::#" + (k - 33) + (p == 100 ? "" : ":" + p);
+                    c += c.endsWith("!") ? c1 : "_" + c1;
+                    if (!il.contains(i)) il.add(i);
+
+                }
+
+                if (sc.size() > 0) {
+
+                    String[] l1 = sc.get(sc.size() - 1).split(";");
+
+                    if (c.equals(l1[0])) {
+
+                        sc.remove(sc.size() - 1);
+
+                        sc.add(c + ";" + ((l1.length == 1 || l1[1].equals("") ? 0 : Long.parseLong(l1[1])) + 1));
+
+                    } else sc.add(c);
+
+                } else sc.add(c);
+
+            }
+
+            for (int i = 0; i < h; i++) {
+                readString(dis);
+                if (v >= 4) dis.readByte();
+                dis.readByte();
+                if (v >= 2) dis.readByte();
+            }
+
+            byte ca = dis.readByte();
+
+            List<String> ro = new ArrayList<>();
+
+            for (int i = 0; i < ca; i++) {
+                readString(dis);
+                ro.add(readString(dis).replace(".ogg", ""));
+                dis.readByte();
+                dis.readByte();
+            }
+
+            String f1 = NBSFile.getName();
+            int pos = f1.lastIndexOf(".");
+            if (pos != -1) f1 = f1.substring(0, pos);
+
+            YamlConfiguration fc = YamlConfiguration.loadConfiguration(outFile);
+
+            fc.set("Song.Id", t.replace(" ", ""));
+            fc.set("Song.Title", t);
+            fc.set("Song.OAuthor", o);
+            fc.set("Song.Author", a);
+            fc.set("Song.Description", d.replace(" ", "").equals("") ? new ArrayList<>() : Arrays.asList(d.split("\n")));
+            fc.set("Song.Category", "RECORDS");
+
+            for (byte i = 0; i < 16; i++) if (il.contains(i)) fc.set("Song.Content.Instruments." + i, i);
+
+            for (int i = 16; i < 16 + ro.size(); i++) fc.set("Song.Content.Instruments." + i, ro.get(i - 16));
+
+            fc.set("Song.Content.Main", sc);
+
+            fc.save(outFile);
+
+            return true;
+
+        } catch (Exception | Error e) {
+            return false;
+        }
+
+    }
+
     public void convertFile(File nbsFile, File outFile) {
         try {
             DataInputStream dataInput = new DataInputStream(Files.newInputStream(nbsFile.toPath()));
@@ -150,7 +278,10 @@ public class NBSManager {
 
             gnbsStruct.save(outFile);
         } catch (Throwable e) {
-            gMusicMain.getLogger().log(Level.SEVERE, "Could not convert nbs file to gnbs file!", e);
+            gMusicMain.getLogger().log(Level.WARNING, "Could not convert " + nbsFile.getPath() + " to gnbs file! use legacy converter...");
+            if (!oldVerConvertFile(nbsFile, outFile)) {
+                gMusicMain.getLogger().log(Level.SEVERE, "Could not convert " + nbsFile.getPath() + " to gnbs file!", e);
+            }
         }
     }
 

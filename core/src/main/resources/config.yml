@@ -6,6 +6,10 @@ Lang:
   
   
 Options:
+  # 插入插件音乐唱片后延迟多少tick停止原版唱片音乐，为0大概率会同时播放
+  # 停止原版音乐为异步任务，所以要设置延迟
+  origin-sound-stop-delay: 5
+
   Sound:
     # ======= 新增 音域扩展 =======
     # Defines whether the extended note range should be used for sounds (requires resource pack for players)

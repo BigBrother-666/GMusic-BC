@@ -182,8 +182,10 @@ public class BoxSongManager {
     		GPM.getValues().removeSongSettings(U);
     		
     		PlaySettings ps = GPM.getValues().getPlaySettings().get(U);
-    		
-    		ps.setCurrentSong(null);
+
+			if (ps != null) {
+				ps.setCurrentSong(null);
+			}
     		
     		if(GPM.getCManager().A_SHOW_MESSAGES && ps != null) {
     			TextComponent anpc = new TextComponent(GPM.getMManager().getMessage("Messages.actionbar-stop"));

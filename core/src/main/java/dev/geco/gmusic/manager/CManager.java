@@ -31,6 +31,8 @@ public class CManager {
 	public List<String> WORLDBLACKLIST = new ArrayList<>();
 
 	public boolean S_EXTENDED_RANGE;
+
+	public long ORIGIN_SOUND_STOP_DELAY;
 	
 	
 	public long P_WAIT_TIME_UNTIL_SHUFFLE;
@@ -70,6 +72,7 @@ public class CManager {
 	
 	public void reload() {
 		S_EXTENDED_RANGE = GPM.getConfig().getBoolean("Options.Sound.extened-range", true);
+		ORIGIN_SOUND_STOP_DELAY = GPM.getConfig().getLong("Options.origin-sound-stop-delay", 2);
 
 		
 		CHECK_FOR_UPDATES = GPM.getConfig().getBoolean("Options.check-for-update", true);

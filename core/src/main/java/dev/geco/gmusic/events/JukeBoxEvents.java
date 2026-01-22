@@ -90,7 +90,7 @@ public class JukeBoxEvents implements Listener {
 									}
 								}
 
-							}.runTaskLaterAsynchronously(GPM, 0);
+							}.runTaskLaterAsynchronously(GPM, GMusicMain.getInstance().getCManager().ORIGIN_SOUND_STOP_DELAY);
 							
 							UUID un = UUID.randomUUID();
 							PlaySettings ps = GPM.getPlaySettingsManager().getPlaySettings(un);
